@@ -1,0 +1,1 @@
+Se trata de hacer 5 vistas independientes , para que las acciones puedan ser o no accesibles al usuario. necesitamos crear 5 vistas show, alta,modificar y borrar.y que estean dentro del menu principal de gestion de funcionalidades
