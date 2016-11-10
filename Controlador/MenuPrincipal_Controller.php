@@ -30,7 +30,7 @@ session_start();
  		}
 
  	//viene de acceder del boton menu principal o index.php
- 	 	if(isset($_POST['principal']))
+ 	 	if(isset($_REQUEST['principal']))
  	 		{
  	 			$idiom=new idiomas();
  	 			$menus=new panel();
