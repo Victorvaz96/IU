@@ -53,6 +53,11 @@ class cabecera{
                     <input type="submit" class="btn btn-default" name="funcionalidad"  value="<?php echo $idiom['Funcionalidad'];?>">    
                     </form>
                 </li>
+				 <li class="sidebar-brand">
+                <form class="principal" method="post" action="..\Controlador\Accion_Controller.php">
+                    <input type="submit" class="btn btn-default" name="accion"  value="<?php echo $idiom['Accion'];?>">    
+                    </form>
+                </li>
                   <li class="sidebar-brand">
                 <form class="principal" method="post" action="..\Controlador\Usuario_Controller.php">
                     <input type="submit" class="btn btn-default" name="usuarios"  value="<?php echo $idiom['GestionUsuarios'];?>">    
