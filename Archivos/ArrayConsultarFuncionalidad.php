@@ -1,7 +1,6 @@
 <?php class consult { function array_consultar(){
 $form=array(
-array("nombre"=>'hola'),
-array("nombre"=>'mierda'),
-array("nombre"=>'Pablo'),
-array("nombre"=>'peiboll'),
+array("nombre"=>'Gestion de Funcionalidades',"descripcion"=>'hola'),
+array("nombre"=>'Gestion de Grupos',"descripcion"=>'hola'),
+array("nombre"=>'Gestion de Usuarios',"descripcion"=>'Modificar Usuarios'),
 );return $form;}}?>

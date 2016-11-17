@@ -8,7 +8,9 @@
   include("../Vistas/Funcionalidad_VIEW_Vista.php");
   include("../Vistas/Funcionalidad_EDIT_Vista.php");
   include("../Vistas/Funcionalidad_Menu_Vista.php");
-session_start();
+  include("../Vistas/MenuPrincipal_Show_Vista.php");
+  include '../Modelos/Usuario_Model.php';
+  session_start();
 
   	if(isset($_POST['funcionalidad']))
   		{
@@ -19,44 +21,75 @@ session_start();
 
   		if(isset($_REQUEST['Alta'])){
   			$idiom=new idiomas();
+        $model=new Funcionalidad();
+        $model->crearArrrayGrupo();
+        include("../Archivos/ArrayGrupo_usuarios.php");
+        $arrays=new consult();
+        $form=$arrays->array_consultar();
   			$alta=new funcionalidadAlta();
-  			$alta->crear($idiom,TRUE);
-
+  			$alta->crear($idiom,FALSE,$form,FALSE);
   		}
   		if (isset($_REQUEST['AltaFuncionalidad']))
   		{
-
   			$idiom=new idiomas();
   			$nombrefuncionalidad=$_POST['Nombre'];
-  			$model=new Funcionalidad();
+        $descripcion=$_POST['descripcion'];
+        $model=new Funcionalidad();
+        if(isset($_POST['grupo'])and isset($_POST['formacciones'])){
+           $grupo=$_POST['grupo'];
+
+           $acciones=$_POST['formacciones']; 
+              foreach($acciones as $accion)
+        { 
+          echo $accion;
+         }
   			$resultado=$model->comprobarexiste($nombrefuncionalidad);
   			if($resultado==FALSE)
   			{
-			$model->altaFuncionalidad($nombrefuncionalidad);
+        $origen="AltaFuncionalidad";
+			  $model->altaFuncionalidad($nombrefuncionalidad,$descripcion,$acciones);
+        $model->insertargrupoFuncionalidad($nombrefuncionalidad,$grupo);
   			$idiom=new idiomas();
-  			$vista=new Funcionalidad_Menu();
-  			$vista->crear($idiom);
+  			$vista=new panel();
+        $vista->constructor($idiom,$origen);
   			}else
   			{
+        $model->crearArrrayGrupo();
+        include("../Archivos/ArrayGrupo_usuarios.php");
+        $arrays=new consult();
+        $form=$arrays->array_consultar();
   			$alta=new funcionalidadAlta();
-  			$alta->crear($idiom,FALSE);
-  			}		
-  		}
-  		if (isset($_POST['Consultar']))
+  			$alta->crear($idiom,TRUE,$form,FALSE);
+  			}
+        }
+        else{
+          $model->crearArrrayGrupo();
+        include("../Archivos/ArrayGrupo_usuarios.php");
+        $arrays=new consult();
+        $form=$arrays->array_consultar();
+        $alta=new funcionalidadAlta();
+        $alta->crear($idiom,FALSE,$form,TRUE);
+
+       
+ }		  		}
+
+  		if (isset($_REQUEST['Consultar']))
 		{
-			$idiom=new idiomas();
-			$model=new Funcionalidad();
-			$model->ConsultarFuncionalidad();
+        $origen="consultar";
+			  $idiom=new idiomas();
+			  $model=new Funcionalidad();
+			  $model->ConsultarFuncionalidad();
   			include("../Archivos/ArrayConsultarFuncionalidad.php");
   			$arrays=new consult();
   			$form=$arrays->array_consultar();
   			$vistas=new Funcionalidad_SHOW();
-  			$vistas->crear($form,$idiom);
+  			$vistas->crear($form,$idiom,$origen);
 
 		}
   		
-  		if (isset($_POST['buscador']))
+  		if (isset($_POST['buscador']) and !isset($_REQUEST['ModificarView']))
   			{
+          $origen="consultar";
   			$idiom=new idiomas();
   			$name=$_POST['buscar'];
   			$model=new Funcionalidad();
@@ -65,63 +98,139 @@ session_start();
   			$arrays=new buscar();
   			$form=$arrays->array_consultar();
   			$vistas=new Funcionalidad_SHOW();
-  			$vistas->crear($form,$idiom);
+  			$vistas->crear($form,$idiom,$origen);
 
 	  		}
 
 	  if (isset($_REQUEST['Modificar']))
-  		{	
+  		 {	  
+          $origen="Modificar";
   				$idiom=new idiomas();
-  				$vista=new funcionalidadEDIT();
-  				$vista->crear($idiom,TRUE);
-
+          $name=$_REQUEST['Modificar'];
+          $model=new Funcionalidad();
+          $model->crearArrrayFuncionalidad($name);
+          include("../Archivos/ArrayFuncionalidad.php");
+          $arrays=new consult();
+          $form=$arrays->array_consultar();
+          $model->crearArraGrupodeFuncionalidad($name);
+          include("../Archivos/ArraGrupodeFuncionalidad.php");
+          $arrays=new grupos1();
+          $formgrupo=$arrays->array_consultar();
+  				$vista=new Funcionalidad_VIEW();
+  				$vista->crear($form,$idiom,$origen,$formgrupo);
   		}
+      if (isset($_REQUEST['Modificar1']))
+      {
+          $origen="Modificar";
+          $idiom=new idiomas();
+          $model=new Funcionalidad();
+          $model->consultarFuncionalidad();
+          include("../Archivos/ArrayConsultarFuncionalidad.php");
+          $arrays=new consult();
+          $form=$arrays->array_consultar();
+          $vista=new Funcionalidad_SHOW();
+          $vista->crear($form,$idiom,$origen);
+         }
+      if(isset($_REQUEST['Modificar2'])){
+          $idiom=new idiomas();
+          $origen="Modificar"; 
+          $name=$_REQUEST['Modificar2'];
+          $model=new Funcionalidad();
+          //cargo los permisos de la funcionalidad
+          $model->permisosdeFuncionalidad($name);
+          include("../Archivos/ArrayPermisosFuncionalidad.php");
+          $datos=new permisosfuncionalidadesss();
+          $model->crearArrrayGrupo();
+          $form=$datos->array_consultar();
+          //cargos los grupos
+          include("../Archivos/ArrayGrupo_usuarios.php");
+          $arrays=new consult();
+          $formgrupo=$arrays->array_consultar();
+          //cargo los grupos de la funcionalidad
+          $model->crearArraGrupodeFuncionalidad($name);
+          include("../Archivos/ArraGrupodeFuncionalidad.php");
+          $arrayss=new grupos1();
+          $formfuncionalidadgrupo=$arrayss->array_consultar();
+          $vista=new funcionalidadEDIT();
+          $vista->crear($idiom,$form,$formgrupo,$formfuncionalidadgrupo,TRUE);
+      }
   		if (isset($_REQUEST['ModificarFuncionalidad']))
-  		{
-  			$idiom=new idiomas();
-  			$name=$_POST['Nombre'];
-  			$namenuevo=$_POST['NombreNuevo'];
-  			$model=new Funcionalidad();
-  			$resultado=$model->comprobarexiste($name);
-  			if($resultado==TRUE){
-  				$model->ModificarFuncionalidad($name,$namenuevo);
-  				$idiom=new idiomas();
-  				$vista=new Funcionalidad_Menu();
-  				$vista->crear($idiom);
-  			}else{
-				$idiom=new idiomas();
-  				$vista=new funcionalidadEDIT();
-  				$vista->crear($idiom,FALSE);
+  		{   
+  			  $idiom=new idiomas();
+  			  $name=$_POST['Nombre'];
+          if(isset($_POST['grupo'])and isset($_POST['formacciones']))
+          { 
+          $origen="Modificar";
+          $grupo=$_POST['grupo'];
+          $permisos=$_POST['formacciones'];
+          $descripcion=$_POST['descripcion'];
+          $model=new Funcionalidad();
+  				$model->ModificarFuncionalidad($name,$descripcion,$permisos);
+          $model->modificarFuncionalidadGrupo($name,$grupo);
+
+          //actualizar los permisos de las funcionalidades
+
+          $model=new Usuario();
+          $user=$_SESSION['usuario'];
+          $grupo=$model->obtenergrupo($user);
+          $modelfunc=new funcionalidad();
+          $modelfunc->crearArraFuncionalidades($grupo);
+          include("../Archivos/ArrayFuncionalidadesDeGrupo.php");
+          $datos=new grupos1();
+          $form=$datos->array_consultar();
+          //generamos el array con todas las funcionalidades y los permisos del grupo de usuario
+          $modelfunc->permisosdeFuncionalidades($form);
+          //
+  				$vista=new panel();
+          $vista->constructor($idiom,$origen);
+          }else{
+           $idiom=new idiomas();
+          $model=new Funcionalidad();
+          //cargo los permisos de la funcionalidad
+          $model->permisosdeFuncionalidad($name);
+          include("../Archivos/ArrayPermisosFuncionalidad.php");
+          $datos=new consultar();
+          $model->crearArrrayGrupo();
+          $form=$datos->array_consultar();
+          //cargos los grupos
+          include("../Archivos/ArrayGrupo_usuarios.php");
+          $arrays=new consult();
+          $formgrupo=$arrays->array_consultar();
+          //cargo los grupos de la funcionalidad
+          $model->crearArraGrupodeFuncionalidad($name);
+          include("../Archivos/ArraGrupodeFuncionalidad.php");
+          $arrayss=new grupos1();
+          $formfuncionalidadgrupo=$arrayss->array_consultar();
+          $vista=new funcionalidadEDIT();
+          $vista->crear($idiom,$form,$formgrupo,$formfuncionalidadgrupo,False);                
+              }
   			}
 
-  		}
-  		if(isset($_POST['Baja'])){
-
-  				$idiom=new idiomas();
-  				$vista=new funcionalidadDelete();
-  				$vista->crear($idiom,TRUE);
+  		if(isset($_REQUEST['Baja'])){
+          $idiom=new idiomas();
+          $model=new Funcionalidad();
+          $model->ConsultarFuncionalidad();
+          include("../Archivos/ArrayConsultarFuncionalidad.php");
+          $arrays=new consult();
+          $form=$arrays->array_consultar();
+  				$vista=new FuncionalidadDelete();
+  				$vista->crear($idiom,TRUE,$form);
 
   		}
   		 if (isset($_REQUEST['BajaFuncionalidad']))
   			{
-
+        $origen="Baja";
   			$idiom=new idiomas();
-  			$name=$_POST['Nombre'];
+  			$name=$_REQUEST['BajaFuncionalidad'];
   			$model=new Funcionalidad();
-  			$resultado=$model->comprobarexiste($name);
-  			if($resultado==TRUE){
-  				$model->BajaFuncionalidad($name);
-  				$idiom=new idiomas();
-  				$vista=new Funcionalidad_Menu();
-  				$vista->crear($idiom);
-  			}else{
-				$idiom=new idiomas();
-  				$vista=new funcionalidadDelete();
-  				$vista->crear($idiom,FALSE);
+  			$model->BajaFuncionalidad($name);
+        $vista=new panel();
+        $vista->constructor($idiom,$origen);
   			}
-  			}
+        
         if(isset($_REQUEST['View']))
         {  
+          $origen="consultar";
           $idiom=new idiomas();
           $name=$_REQUEST['View'];
           $model=new Funcionalidad();
@@ -129,17 +238,65 @@ session_start();
           include("../Archivos/ArrayFuncionalidad.php");
           $arrays=new consult();
           $form=$arrays->array_consultar();
+          $model->crearArraGrupodeFuncionalidad($name);
+          include("../Archivos/ArraGrupodeFuncionalidad.php");
+          $arrays=new grupos1();
+          $formgrupo=$arrays->array_consultar();
           $vistas=new Funcionalidad_VIEW();
-          $vistas->crear($form,$idiom);
-
+          $vistas->crear($form,$idiom,$origen,$formgrupo);
         }
-
+        if(isset($_REQUEST['BajaShow']))
+        {  
+          $origen="Baja";
+          $idiom=new idiomas();
+          $name=$_POST['buscar'];
+          $model=new Funcionalidad();
+          $model->buscarFuncionalidad($name);
+          include("../Archivos/ArrayBuscarFuncionalidad.php");
+          $arrays=new buscar();
+          $form=$arrays->array_consultar();
+          $vistas=new funcionalidadDelete();
+          $vistas->crear($idiom,TRUE,$form);
+        }
+         if(isset($_REQUEST['BajaShow1']))
+         {
+          $origen="Baja";
+          $idiom=new idiomas();
+          $name=$_REQUEST['BajaShow1'];
+          $model=new Funcionalidad();
+          $model->crearArrrayFuncionalidad($name);
+          include("../Archivos/ArrayFuncionalidad.php");
+          $arrays=new consult();
+          $form=$arrays->array_consultar();
+          include("../Archivos/ArraGrupodeFuncionalidad.php");
+          $arrays=new grupos1();
+          $formgrupo=$arrays->array_consultar();
+          $vistas=new Funcionalidad_VIEW();
+          $vistas->crear($form,$idiom,$origen,$formgrupo);
+         }
+        if(isset($_REQUEST['ModificarView']))
+      {
+        $origen="Modificar";
+        $idiom=new idiomas();
+        $name=$_POST['buscar'];
+        $model=new Funcionalidad();
+        $model->buscarFuncionalidad($name);
+        include("../Archivos/ArrayBuscarFuncionalidad.php");
+        $arrays=new buscar();
+        $form=$arrays->array_consultar();
+        $model->crearArraGrupodeFuncionalidad($name);
+        include("../Archivos/ArraGrupodeFuncionalidad.php");
+        $arrays=new grupos1();
+        $formgrupo=$arrays->array_consultar();
+        $vistas=new Funcionalidad_Show();
+        $vistas->crear($form,$idiom,$origen,$formgrupo);
+      }
   			if (isset($_REQUEST['Volver']))
   			{
-
-  			$idiom=new idiomas();
-  			$vista=new Funcionalidad_Menu();
-  			$vista->crear($idiom);
+          $origen="volver";
+        $idiom=new idiomas();
+        $vista=new panel();
+        $vista->constructor($idiom,$origen);
   			}
 
   		

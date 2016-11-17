@@ -3,16 +3,17 @@
 	class Usuarios_Menu{
 
 		function crear($idioma){ 
-			include '../plantilla/cabecera.php';
-			
-			$cabecera=new cabecera();
-			$cabecera->crear($idioma);
-
-       		$clase=new comprobacion();
-    		$idiom=$clase->comprobaridioma($idioma);
+			include('../plantilla/cabecera.php');
+        	include("../Funciones/comprobaridioma.php");
+        	$clase=new cabecera();
+        	$clases=new comprobacion();
+        	$idiom=$clases->comprobaridioma($idioma);
+        	$clase->crear($idiom);
+        	include('../plantilla/menulateral.php');
+        	$menus=new menulateral();
+       		$menus->crear($idiom);
     		?>
     
-	
 			<div class="container well">
  			<div class="row">
 			<div class="col-xs-12">
@@ -32,8 +33,7 @@
 	</div>
 	</div>
 			<?php 
-
-
+	include '../plantilla/pie.php';
 		}	
 
 			

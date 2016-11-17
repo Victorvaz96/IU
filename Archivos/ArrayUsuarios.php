@@ -1,6 +1,7 @@
 <?php class consult { function array_consultar(){
 $form=array(
 array("nombre"=>'Pablo',"apellido1"=>'Gonzalez Rodriguez',
-					"dni"=>'1213131',"usuario"=>'admin',
-					"password"=>'21232f297a57a5a743894a0e4a801fc3'),
+					"dni"=>'1213131',"usuario"=>'ADMIN',"email"=>'pablopeiboll@gmail.com',
+					"password"=>'ADMIN',"fecha"=>'2016-11-02',"grupo"=>'ADMIN',"foto"=>'c60d1e50-e85b-4ef8-9414-7790c09f2a63.jpg',
+					"codigopostal"=>'23131',"cuenta"=>'231311',"descripcion"=>'2313131'),
 );return $form;}}?>

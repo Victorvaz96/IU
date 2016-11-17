@@ -2,7 +2,7 @@
 
 	class Funcionalidad_Menu{
 
-		function crear($idioma){ 
+		function crear($idioma,$origen){ 
 			include '../plantilla/cabecera.php';
 			
 			$cabecera=new cabecera();
@@ -10,7 +10,9 @@
 
        		$clase=new comprobacion();
     		$idiom=$clase->comprobaridioma($idioma);
-    		?>
+
+    		
+ 			    		?>
 			<div class="container well">
  			<div class="row">
 			<div class="col-xs-12">

@@ -24,7 +24,7 @@ class Usuario
 	}
 	
 	function conexionBD(){
-				$mysqli=mysqli_connect("127.0.0.1","root","","iu");
+				$mysqli=mysqli_connect("127.0.0.1","root","","iu2");
 				if(!$mysqli){
 					echo "Error: No se pudo conectar a MySQL." . PHP_EOL;
     				echo "error de depuración: " . mysqli_connect_errno() . PHP_EOL;
@@ -141,12 +141,12 @@ class Usuario
 		}
 	}
 
-	function altaUsuario($nombr,$apellidos,$fecha,$email,$usuario,$pass,$dni,$grupo)
+	function altaUsuario($nombr,$apellidos,$fecha,$email,$usuario,$pass,$dni,$grupo,$foto,$codigopostal,$cuenta,$descripcion)
 	{	
 			$mysqli=$this->conexionBD();
-			$query="INSERT INTO `usuario`(`USUARIO`, `PASSWORD`, `NOMBRE`, `APELLIDOS`, `DNI`, `GRUPO_NOMBRE_GRUPO`) VALUES ('$usuario','$pass','$nombr','$apellidos','$dni','$grupo')";
+			$query="INSERT INTO `usuario`(`USUARIO`, `PASSWORD`, `NOMBRE`, `APELLIDOS`, `DNI`, `GRUPO_NOMBRE_GRUPO`,`FOTO`, `CODIGOPOSTAL`, `CUENTABANCARIA`, `DESCRIPCION`, `FechaNac`,`EMAIL`) VALUES ('$usuario','$pass','$nombr','$apellidos','$dni','$grupo','$foto','$codigopostal','$cuenta','$descripcion','$fecha','$email')";
 			$mysqli->query($query);
-			$mysqli->close();		
+			$mysqli->close();
 	}
 	//funcion que te dice si el usuario o ese dni estan en la base de datos.
 	function comprobarexiste($user,$dni)
@@ -192,32 +192,57 @@ class Usuario
 			}
 			foreach($filas as $fila)
 			{ 
-				$nombre=$fila['NOMBRE'];
+				 $nombre=$fila['NOMBRE'];
 				 $apellido1=$fila['APELLIDOS'];
 				 $dni=$fila['DNI'];
-				 //$email=$fila['EMAIL'];
+				 $email=$fila['EMAIL'];
 				 $usuario=$fila['USUARIO'];
 				 $password=$fila['PASSWORD'];
-				// $fechaNac=$fila['FechaNac'];
+				 $fechaNac=$fila['FechaNac'];
+				 $grupo=$fila[ 'GRUPO_NOMBRE_GRUPO'];
+				 $foto=$fila['FOTO'];
+				 $codigopostal=$fila['CODIGOPOSTAL'];
+				 $cuenta=$fila['CUENTABANCARIA'];
+				 $descripcion=$fila['DESCRIPCION'];
 				 fwrite($file,"array(\"nombre\"=>'$nombre',\"apellido1\"=>'$apellido1',
-					\"dni\"=>'$dni',\"usuario\"=>'$usuario',
-					\"password\"=>'$password')," . PHP_EOL);
+					\"dni\"=>'$dni',\"usuario\"=>'$usuario',\"email\"=>'$email',
+					\"password\"=>'$password',\"fecha\"=>'$fechaNac',\"grupo\"=>'$grupo',\"foto\"=>'$foto',
+					\"codigopostal\"=>'$codigopostal',\"cuenta\"=>'$cuenta',\"descripcion\"=>'$descripcion')," . PHP_EOL);
 			 }
 		}
 				 fwrite($file,");return \$form;}}?>". PHP_EOL);
 				 fclose($file);
 				 $resultado->free();
 				 $mysqli->close();
-
 		}
-	function modificarUsuario($nombr,$apellidos,$email,$usuario,$nuevousuario,$pass,$dni,$grupo)
+
+		function obtenergrupo($user){
+			$grupo="";
+		$mysqli=$this->conexionBD();
+			$mysqli=$this->conexionBD();
+		$resultado=$mysqli->query("SELECT * FROM usuario where USUARIO ='$user'");
+		if(mysqli_num_rows($resultado)){
+		while($fila = $resultado->fetch_array())
+			{
+				$filas[] = $fila;
+			}
+			foreach($filas as $fila)
+			{ 	
+				 $grupo=$fila[ 'GRUPO_NOMBRE_GRUPO'];
+			 }
+		}
+				 $resultado->free();
+				 $mysqli->close();
+				 return $grupo;
+		}
+
+
+	function modificarUsuario($nombreUsuario,$apellidos,$Fecha,$email,$usuario,$password,$dni,$grupo,$foto,$codigopostal,$cuenta,$descripcion)
 	{
 		$mysqli=$this->conexionBD();
-			$query="UPDATE `usuario` SET `USUARIO`='$nuevousuario',`PASSWORD`='$pass',`NOMBRE`='$nombr',`APELLIDOS`='$apellidos',`DNI`='$dni',`GRUPO_NOMBRE_GRUPO`='$grupo' WHERE USUARIO='$usuario'";
+			$query="UPDATE `usuario` SET `USUARIO`='$usuario',`PASSWORD`='$password',`NOMBRE`='$nombreUsuario',`APELLIDOS`='$apellidos',`DNI`='$dni',`GRUPO_NOMBRE_GRUPO`='$grupo',`FOTO`='$foto',`CODIGOPOSTAL`='$codigopostal',`CUENTABANCARIA`='$cuenta',`DESCRIPCION`='$descripcion',`FechaNac`='$Fecha',`EMAIL`='$email' WHERE USUARIO='$usuario'";
 			$mysqli->query($query);
 			$mysqli->close();
-
-
 	}
 	function eliminarUsuario($user)
 	{
@@ -226,10 +251,6 @@ class Usuario
 				$mysqli->query($query);
 				$mysqli->close();
 					
-	}
-	function CconsultarUsuario()
-	{
-
 	}
 
 	}

@@ -95,7 +95,6 @@ if(isset($_SESSION['usuario']))
 		
 		<!--<input type="submit" class="btn btn-primary" name="login" onclick="encriptar();" value="Entrar"></input>-->
 		<input type="submit" class="btn btn-primary" name="login"  value="Entrar"></input>
-		<input type="submit" class="btn btn-primary" name="registrar" value="Registrarse"></input>
 		</form>
 
 		

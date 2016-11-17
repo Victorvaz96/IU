@@ -1,34 +1,52 @@
 <?php 
 class UsuarioDelete{
 
-	function crear($idioma,$resultado){
+	function crear($idioma,$resultado,$form){
 
-		include '../plantilla/cabecera.php';
-			$cabecera=new cabecera();
-			$cabecera->crear($idioma);
+       		include('../plantilla/cabecera.php');
+        include("../Funciones/comprobaridioma.php");
+        $clase=new cabecera();
+        $clases=new comprobacion();
+        $idiom=$clases->comprobaridioma($idioma);
+        $clase->crear($idiom);
+        include('../plantilla/menulateral.php');
+        include("../Archivos/ArrayPermisosFuncionalidadades.php");
+        $datos=new consultar();
+        $form1=$datos->array_consultar();
+        $menus=new menulateral();
+        $menus->crear($idiom,$form1);
 
-			$clase=new comprobacion();
-    		$idiom=$clase->comprobaridioma($idioma);
 ?>
- <?php
+ 			<?php
  			if ($resultado==FALSE){
  				echo "<script>alert(\"".$idiom["Eliminado"]."\")</script>";
  			}
- 			
-			echo "<div class=\"container well\">";
- 			echo "<div class=\"row\">";
-			echo "<div class=\"col-xs-12\">";
-			echo "<form class=\"form-horizontal\" method=\"post\" action=\"..\Controlador\Usuario_Controller.php?BajaUsuario\">";
-			echo "<fieldset><legend>".$idiom['Usuario']."</legend>";
-			echo "<div class=\"form-group\"><label class=\"col-sm-2 control-label\" for=\"usuario\"> ".$idiom['Usuario'].":</label>";
-			echo "<div class=\"input-group col-sm-3\">";
-			echo "<"."input"." "."class=\"form-control\""."type=\"text\" required  name=\"usuario\">"; 
-			echo "</div></div>";
-			echo "<a href=\"Usuario_Controller.php?BajaUsuario\"><input type=\"image\" src=\"..\Archivos\\eliminar.png\" width=\"20\" height=\"20\"></a>";
-			echo "</fieldset>";
-			echo "</form>";
-			echo "<a href=\"Usuario_Controller.php?Volver\"><input type=\"image\" src=\"..\Archivos\\volver.png\" width=\"20\" height=\"20\"></a>";
+ 			?>
+ 			<form action="Usuario_Controller.php?BajaShow" method="post">
+			<fieldset>
+			<input type="text" aling="right" placeholder=<?php echo $idiom['Usuario']; ?> name="buscar" ><input  type="submit" name="BajaShow" value="Buscar">
+			</fieldset>
+			</form> <?php
+			for ($numar =0;$numar<count($form);$numar++){
 
+			echo "<div class=\"container well\">";
+ 			echo "<div class=\"row\">"; 
+			echo "<div class=\"col-xs-12\">";
+			echo "<form class=\"form-horizontal\" method=\"post\" action=\"..\Controlador\Usuario_Controller.php?ViewBaja=".$form[$numar]['usuario']."\">";
+			echo "<fieldset><legend>".$idiom['Usuario']."</legend>";
+			echo "<br>";
+			echo $idiom['DNI'].":".$form[$numar]["dni"];
+			echo "<br>";
+			echo $idiom['Usuario'].":".$form[$numar]["usuario"];
+			echo "<br>";
+			echo "<a href=\"Usuario_Controller.php?ViewBaja=".$form[$numar]['usuario']."\""."><input type=\"image\"  src=\"..\Archivos\\eliminar.png\" width=\"20\" height=\"20\"></a>";
+			echo"</fieldset>";
+			echo"</form>";
+ 			echo "</div>";
+			echo "</div>";
+			echo "</div>";
+			
+		 	}
 ?>
 
 

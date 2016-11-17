@@ -1,9 +1,10 @@
 <?php 
 
+
 class panel{ 
     
-	function constructor($idioma){ 
-
+	function constructor($idioma,$origen)
+    { 
         include('../plantilla/cabecera.php');
         include("../Funciones/comprobaridioma.php");
         $clase=new cabecera();
@@ -11,10 +12,13 @@ class panel{
         $idiom=$clases->comprobaridioma($idioma);
         $clase->crear($idiom);
         include('../plantilla/menulateral.php');
+        include("../Archivos/ArrayPermisosFuncionalidadades.php");
+        $datos=new consultar();
+        $form=$datos->array_consultar();
         $menus=new menulateral();
-        $menus->crear($idiom);
+        $menus->crear($idiom,$form);
         ?>
-
+    
        <div id="page-wrapper">
 
             <div class="container-fluid">
@@ -295,8 +299,21 @@ class panel{
         <?php
         include'../plantilla/pie.php';
 	?>
-
+    
  <?php
+        if ($origen=="Baja"){
+                echo "<script>alert(\"".$idiom["EliminacionExito"]."\")</script>";
+                 }
+        if ($origen=="Alta"){
+                echo "<script>alert(\"".$idiom["Altarealizada"]."\")</script>";
+                 }
+        if ($origen=="Modificar"){
+                echo "<script>alert(\"".$idiom["Modificacionrealizada"]."\")</script>";
+                 }
+        if($origen=="AltaFuncionalidad"){
+                      echo "<script>alert(\"".$idiom["Altarealizada"]."\")</script>";
+         }
+
  }
   }
 ?>

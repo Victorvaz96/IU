@@ -11,7 +11,7 @@ class Grupo{
 	}
 		function conexionBD()
 		{
-				$mysqli=mysqli_connect("127.0.0.1","root","","iu");
+				$mysqli=mysqli_connect("127.0.0.1","root","","iu2");
 				if(!$mysqli)
 				{
 					echo "Error: No se pudo conectar a MySQL." . PHP_EOL;
@@ -22,10 +22,10 @@ class Grupo{
 				
 			return $mysqli;
 		}
-		function altaGrupo($nombre)
+		function altaGrupo($nombre,$descripcion)
 		{	
 			$mysqli=$this->conexionBD();
-			$query="INSERT INTO `grupo`(`NOMBRE_GRUPO`) VALUES ('$nombre')";
+			$query="INSERT INTO `grupo`(`NOMBRE_GRUPO`, `DESCRIPCION`) VALUES ('$nombre','$descripcion')";
 			$mysqli->query($query);
 			$mysqli->close();
 				
@@ -33,7 +33,7 @@ class Grupo{
 		function comprobarexiste($name)
 		{
 			$mysqli=$this->conexionBD();
-			$query="SELECT * FROM grupo where NOMBRE_GRUPO ='$name'";
+			$query="SELECT * FROM grupo where `NOMBRE_GRUPO` ='$name'";
 			$resultado=$mysqli->query($query);
 			if(mysqli_num_rows($resultado)){
 				$mysqli->close();
@@ -44,10 +44,46 @@ class Grupo{
 				return FALSE;
 			}
 		}
+		function consultarFuncionalidad()
+		{
+				 $file = fopen("../Archivos/ArrayConsultarFuncionalidad.php", "w");
+				 fwrite($file,"<?php class consult { function array_consultar(){". PHP_EOL);
+				 fwrite($file,"\$form=array(" . PHP_EOL);
+
+			$mysqli=$this->conexionBD();
+			$query="SELECT * FROM funcionalidades ";
+			$resultado=$mysqli->query($query);
+			if(mysqli_num_rows($resultado)){
+				while($fila = $resultado->fetch_array())
+			{
+				$filas[] = $fila;
+			}
+			foreach($filas as $fila)
+			{ 
+				$nombre=$fila['NOMBRE_FUNCIONALIDAD'];
+				$descripcion=$fila['DESCRIPCION'];
+				fwrite($file,"array(\"nombre\"=>'$nombre',\"descripcion\"=>'$descripcion')," . PHP_EOL);
+			}
+			}
+			 fwrite($file,");return \$form;}}?>". PHP_EOL);
+				 fclose($file);
+				 $resultado->free();
+				 $mysqli->close();
+		}
+		function inserGrupoFuncionalidades($grupo,$funcionalidades){
+			foreach($funcionalidades as $funcionalidad)
+			{
+			$mysqli=$this->conexionBD();
+			$query="INSERT INTO `fun_grupo`(`NOMBRE_FUNCIONALIDAD`, `NOMBRE_GRUPO`) VALUES ('$funcionalidad','$grupo')";
+			$mysqli->query($query);
+			$mysqli->close();
+			}
+
+		}
 		function bajaGrupo($name)
 			{
 				$mysqli=$this->conexionBD();
-				$query="DELETE FROM `grupo` WHERE NOMBRE_GRUPO='$name'";
+				$query="DELETE FROM `grupo` WHERE `NOMBRE_GRUPO`='$name'";
 				$mysqli->query($query);
 				$mysqli->close();
 					
@@ -59,7 +95,7 @@ class Grupo{
 		fwrite($file,"<?php class consult { function array_consultar(){". PHP_EOL);
 				 	fwrite($file,"\$form=array(" . PHP_EOL);
 		$mysqli=$this->conexionBD();
-		$resultado=$mysqli->query("SELECT * FROM grupo where NOMBRE_GRUPO ='$name'");
+		$resultado=$mysqli->query("SELECT * FROM grupo where `NOMBRE_GRUPO` ='$name'");
 		if(mysqli_num_rows($resultado)){
 		while($fila = $resultado->fetch_array())
 			{
@@ -68,8 +104,8 @@ class Grupo{
 			foreach($filas as $fila)
 			{ 
 				$nombre=$fila['NOMBRE_GRUPO'];
-				
-				 fwrite($file,"array(\"nombre\"=>'$nombre')," . PHP_EOL);
+				$descripcion=$fila['DESCRIPCION'];
+				 fwrite($file,"array(\"nombre\"=>'$nombre',\"descripcion\"=>'$descripcion')," . PHP_EOL);
 			 }
 		}
 				 fwrite($file,");return \$form;}}?>". PHP_EOL);
@@ -78,14 +114,12 @@ class Grupo{
 				 $mysqli->close();
 
 		}
-
-		function modificarGrupo($name,$namenuevo)
+		function modificarGrupo($name,$descripcion)
 		{
 			$mysqli=$this->conexionBD();
-			$query="UPDATE `grupo` SET `NOMBRE_GRUPO`='$namenuevo' where NOMBRE_GRUPO='$name'";
+			$query="UPDATE `grupo` SET `DESCRIPCION`='$descripcion' where `NOMBRE_GRUPO`='$name'";
 			$mysqli->query($query);
 			$mysqli->close();
-
 		}
 		function consultarGrupo()
 		{
@@ -104,7 +138,8 @@ class Grupo{
 			foreach($filas as $fila)
 			{ 
 				$nombre=$fila['NOMBRE_GRUPO'];
-				fwrite($file,"array(\"nombre\"=>'$nombre')," . PHP_EOL);
+				$descripcion=$fila['DESCRIPCION'];
+				fwrite($file,"array(\"nombre\"=>'$nombre',\"descripcion\"=>'$descripcion')," . PHP_EOL);
 			}
 			}
 			 fwrite($file,");return \$form;}}?>". PHP_EOL);
@@ -112,13 +147,57 @@ class Grupo{
 				 $resultado->free();
 				 $mysqli->close();
 		}
+
+		function modificarFuncionalidadGrupo($funcionalidades,$grupo){
+			
+				$mysqli=$this->conexionBD();
+				$query="DELETE from `fun_grupo` WHERE `NOMBRE_GRUPO`='$grupo'";
+				$mysqli->query($query);
+				$mysqli->close();
+				foreach($funcionalidades as $funcionalidad)
+				{  
+				$mysqli=$this->conexionBD();
+				$query="INSERT INTO `fun_grupo`(`NOMBRE_FUNCIONALIDAD`, `NOMBRE_GRUPO`) VALUES ('$funcionalidad','$grupo')";
+				$mysqli->query($query);
+				$mysqli->close();
+				}
+
+		}
+
+		function crearArraGrupodeFuncionalidad($name){
+			$mysqli=$this->conexionBD();
+			$file = fopen("../Archivos/ArraGrupodeFuncionalidad.php", "w");
+		    fwrite($file,"<?php class grupos1 { function array_consultar(){". PHP_EOL);
+			fwrite($file,"\$form=array(" . PHP_EOL);
+			$query="SELECT * FROM `fun_grupo` WHERE `NOMBRE_GRUPO`='$name'";
+			$resultado=$mysqli->query($query);
+			if($resultado!=NULL){
+			if(mysqli_num_rows($resultado)){
+				while($fila = $resultado->fetch_array())
+			{
+				$filas[] = $fila;
+			}
+			foreach($filas as $fila)
+			{ 
+				$grupo=$fila['NOMBRE_GRUPO'];
+				$funcionalidad=$fila['NOMBRE_FUNCIONALIDAD'];
+				fwrite($file,"array(\"grupo\"=>'$grupo',\"funcionalidad\"=>'$funcionalidad')," . PHP_EOL);
+			 }
+			 }
+			fwrite($file,");return \$form;}}?>". PHP_EOL);
+		}else{ fwrite($file,");return \$form;}}?>". PHP_EOL);}	
+			fclose($file);
+			$mysqli->query($query);
+			$mysqli->close();
+
+		}
 		function buscarGrupo($nombre)
 		{
 			 $file = fopen("../Archivos/ArrayBuscarGrupo.php", "w");
 				 fwrite($file,"<?php class buscar { function array_consultar(){". PHP_EOL);
 				 fwrite($file,"\$form=array(" . PHP_EOL);
 				 $mysqli=$this->conexionBD();
-			$query="SELECT * FROM grupo where NOMBRE_GRUPO like '%%$nombre%%'";
+			$query="SELECT * FROM grupo where `NOMBRE_GRUPO` like '%%$nombre%%'";
 			$resultado=$mysqli->query($query);
 		if(mysqli_num_rows($resultado)){
 				while($fila = $resultado->fetch_array())
@@ -128,7 +207,8 @@ class Grupo{
 			foreach($filas as $fila)
 			{ 
 				$nombre=$fila['NOMBRE_GRUPO'];
-				fwrite($file,"array(\"nombre\"=>'$nombre')," . PHP_EOL);
+				$descripcion=$fila['DESCRIPCION'];
+				fwrite($file,"array(\"nombre\"=>'$nombre',\"descripcion\"=>'$descripcion')," . PHP_EOL);
 			}
 			}
 			 fwrite($file,");return \$form;}}?>". PHP_EOL);
